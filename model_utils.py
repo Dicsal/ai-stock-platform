@@ -1,5 +1,6 @@
 import yfinance as yf
 import pandas as pd
+import requests
 import random
 
 def compute_rsi(series, period=14):
@@ -16,19 +17,29 @@ def compute_macd(close):
     signal = macd_line.ewm(span=9).mean()
     return macd_line - signal
 
+def get_sp500_symbols():
+    url = "https://datahub.io/core/s-and-p-500-companies/r/constituents.csv"
+    df = pd.read_csv(url)
+    return df["Symbol"].tolist()
+
 def load_data(symbols):
     results = []
     stock_data = {}
 
     for sym in symbols:
-        data = yf.download(sym, start="2022-01-01", end="2024-12-31")
-        data['SMA5'] = data['Close'].rolling(5).mean()
-        data['SMA20'] = data['Close'].rolling(20).mean()
-        data['RSI'] = compute_rsi(data['Close'])
-        data['MACD_diff'] = compute_macd(data['Close'])
-        data.dropna(inplace=True)
-        stock_data[sym] = data.copy()
-        results.append({"Symbol": sym})
+        try:
+            data = yf.download(sym, start="2023-01-01", end="2024-12-31")
+            if data.empty:
+                continue
+            data['SMA5'] = data['Close'].rolling(5).mean()
+            data['SMA20'] = data['Close'].rolling(20).mean()
+            data['RSI'] = compute_rsi(data['Close'])
+            data['MACD_diff'] = compute_macd(data['Close'])
+            data.dropna(inplace=True)
+            stock_data[sym] = data.copy()
+            results.append({"Symbol": sym})
+        except Exception:
+            continue
 
     return pd.DataFrame(results), stock_data
 
