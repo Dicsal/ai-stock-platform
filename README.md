@@ -1,19 +1,14 @@
-# 升級版 AI 選股平台
+# AI Stock Strategy Customizer (with Fundamental Filters)
 
-新增功能：
-- 📈 K線圖 + SMA 技術線
-- 🧠 AI 選股打分排序系統
+功能：
+- ✅ 技術條件選股：RSI、SMA、MACD、成交量、突破、漲幅等
+- ✅ 財報條件選股：P/E、P/B、D/E、EPS 成長、Dividend Yield
+- ✅ 視覺化選單、自定義策略儲存
+- ✅ 顯示技術圖表與篩選結果
 
-## 本地執行
+## 執行方式
+
 ```bash
 pip install -r requirements.txt
 streamlit run main.py
 ```
-
-## Streamlit Cloud 部署
-1. 上傳此專案到 GitHub
-2. 在 https://streamlit.io/cloud 設定：
-   - repo: yourusername/ai-stock-platform
-   - branch: main
-   - main file: main.py
-3. 點 Deploy
