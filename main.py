@@ -7,7 +7,7 @@ from chart_utils import show_stock_chart
 st.set_page_config(page_title="📈 AI 自動選股平台 - S&P 500", layout="wide")
 st.title("📈 AI 選股平台（S&P 500 全自動分析）")
 
-st.markdown("🔍 本平台將自動分析 S&P 500 所有股票，根據技術與基本面條件篩選。")
+st.markdown("🔍 自動分析 S&P 500 所有股票，根據技術與基本面條件篩選。")
 
 st.header("📋 自訂選股條件")
 
@@ -41,5 +41,5 @@ if st.button("🚀 開始分析 S&P 500"):
     st.subheader("✅ 符合條件的股票")
     st.dataframe(df_filtered)
 
-    for sym in df_filtered["Symbol"].head(5):  # 限制顯示前5圖表
+    for sym in df_filtered["Symbol"].head(5):
         st.plotly_chart(show_stock_chart(stock_data[sym], sym))
