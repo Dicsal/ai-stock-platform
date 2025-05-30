@@ -11,6 +11,7 @@ def compute_rsi(series, period=14):
 
 def load_data_and_predict(symbols):
     results = []
+    stock_data = {}
 
     for symbol in symbols:
         try:
@@ -29,8 +30,9 @@ def load_data_and_predict(symbols):
             pred = model.predict(X[-50:])
             acc = (pred == y[-50:]).mean()
 
-            results.append({'股票代碼': symbol, '預測準確率': round(acc * 100, 2)})
+            results.append({'股票代碼': symbol, '預測準確率': round(acc * 100, 2), '最新RSI': round(data['RSI'].iloc[-1], 2)})
+            stock_data[symbol] = data.copy()
         except Exception as e:
-            results.append({'股票代碼': symbol, '預測準確率': '錯誤: ' + str(e)})
+            results.append({'股票代碼': symbol, '預測準確率': 0, '最新RSI': 0})
 
-    return pd.DataFrame(results)
+    return pd.DataFrame(results), stock_data
