@@ -1,6 +1,5 @@
-# AI Stock Auto Screener for S&P 500 (Fixed)
+# FINAL FIXED - AI Stock Screener for S&P 500
 
-執行方式：
 ```bash
 pip install -r requirements.txt
 streamlit run main.py

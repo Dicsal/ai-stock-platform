@@ -13,34 +13,56 @@ def apply_strategy_filter(df_results, stock_data, fundamentals, config):
         yesterday = data.iloc[-2] if len(data) > 1 else today
         fund = fundamentals.get(symbol, {})
 
-        pass_filter = True
+        try:
+            if config.get("RSI"):
+                rsi = today.get("RSI", None)
+                if rsi is None or pd.isna(rsi) or rsi >= 30:
+                    continue
 
-        if config.get("RSI") and pd.notna(today.get("RSI")) and today["RSI"] >= 30:
-            pass_filter = False
-        if config.get("SMA") and pd.notna(today.get("SMA5")) and pd.notna(today.get("SMA20")) and today["SMA5"] <= today["SMA20"]:
-            pass_filter = False
-        if config.get("VOLUME") and pd.notna(today.get("Volume")) and pd.notna(yesterday.get("Volume")) and today["Volume"] <= yesterday["Volume"] * 1.5:
-            pass_filter = False
-        if config.get("MACD") and pd.notna(today.get("MACD_diff")) and today["MACD_diff"] <= 0:
-            pass_filter = False
-        if config.get("CHANGE") and pd.notna(today.get("Close")) and pd.notna(yesterday.get("Close")) and (today["Close"] - yesterday["Close"]) / yesterday["Close"] <= 0.03:
-            pass_filter = False
-        if config.get("BREAKOUT") and pd.notna(today.get("Close")) and pd.notna(data["Close"].rolling(20).max().iloc[-2]):
-            if today["Close"] <= data["Close"].rolling(20).max().iloc[-2]:
-                pass_filter = False
+            if config.get("SMA"):
+                sma5 = today.get("SMA5")
+                sma20 = today.get("SMA20")
+                if sma5 is None or sma20 is None or pd.isna(sma5) or pd.isna(sma20) or sma5 <= sma20:
+                    continue
 
-        if config.get("PE")[0] and fund.get("pe", 1000) >= config["PE"][1]:
-            pass_filter = False
-        if config.get("PB")[0] and fund.get("pb", 1000) >= config["PB"][1]:
-            pass_filter = False
-        if config.get("DE")[0] and fund.get("de", 1000) >= config["DE"][1]:
-            pass_filter = False
-        if config.get("EPS")[0] and fund.get("eps_growth", 0) <= config["EPS"][1]:
-            pass_filter = False
-        if config.get("DIV")[0] and fund.get("div_yield", 0) <= config["DIV"][1]:
-            pass_filter = False
+            if config.get("VOLUME"):
+                v_today = today.get("Volume")
+                v_yest = yesterday.get("Volume")
+                if v_today is None or v_yest is None or pd.isna(v_today) or pd.isna(v_yest) or v_today <= v_yest * 1.5:
+                    continue
 
-        if pass_filter:
+            if config.get("MACD"):
+                macd = today.get("MACD_diff")
+                if macd is None or pd.isna(macd) or macd <= 0:
+                    continue
+
+            if config.get("CHANGE"):
+                c_today = today.get("Close")
+                c_yest = yesterday.get("Close")
+                if c_today is None or c_yest is None or pd.isna(c_today) or pd.isna(c_yest) or (c_today - c_yest) / c_yest <= 0.03:
+                    continue
+
+            if config.get("BREAKOUT"):
+                close = today.get("Close")
+                if close is None or pd.isna(close):
+                    continue
+                max20 = data["Close"].rolling(20).max().iloc[-2] if len(data) >= 20 else None
+                if max20 is None or pd.isna(max20) or close <= max20:
+                    continue
+
+            if config.get("PE")[0] and fund.get("pe", 1000) >= config["PE"][1]:
+                continue
+            if config.get("PB")[0] and fund.get("pb", 1000) >= config["PB"][1]:
+                continue
+            if config.get("DE")[0] and fund.get("de", 1000) >= config["DE"][1]:
+                continue
+            if config.get("EPS")[0] and fund.get("eps_growth", 0) <= config["EPS"][1]:
+                continue
+            if config.get("DIV")[0] and fund.get("div_yield", 0) <= config["DIV"][1]:
+                continue
+
             result.append({"Symbol": symbol, **fund})
+        except:
+            continue
 
     return pd.DataFrame(result)
