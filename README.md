@@ -1,4 +1,4 @@
-# VERIFIED SAFE - AI Stock Screener for S&P 500
+# Final AI Stock Screener (No Crash)
 
 ```bash
 pip install -r requirements.txt

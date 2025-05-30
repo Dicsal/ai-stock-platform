@@ -38,8 +38,10 @@ if st.button("🚀 開始分析 S&P 500"):
     df_fundamentals = load_fundamentals(symbols)
     df_filtered = apply_strategy_filter(df_results, stock_data, df_fundamentals, config)
 
-    st.subheader("✅ 符合條件的股票")
-    st.dataframe(df_filtered)
-
-    for sym in df_filtered["Symbol"].head(5):
-        st.plotly_chart(show_stock_chart(stock_data[sym], sym))
+    if df_filtered.empty:
+        st.warning("⚠️ 沒有符合條件的股票，請放寬篩選條件再試。")
+    else:
+        st.subheader("✅ 符合條件的股票")
+        st.dataframe(df_filtered)
+        for sym in df_filtered["Symbol"].head(5):
+            st.plotly_chart(show_stock_chart(stock_data[sym], sym))
