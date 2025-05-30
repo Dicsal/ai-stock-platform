@@ -15,39 +15,37 @@ def apply_strategy_filter(df_results, stock_data, fundamentals, config):
 
         try:
             if config.get("RSI"):
-                rsi = today.get("RSI", None)
-                if rsi is None or pd.isna(rsi) or rsi >= 30:
+                rsi = today["RSI"] if "RSI" in today and pd.notna(today["RSI"]) else None
+                if rsi is None or rsi >= 30:
                     continue
 
             if config.get("SMA"):
-                sma5 = today.get("SMA5")
-                sma20 = today.get("SMA20")
-                if sma5 is None or sma20 is None or pd.isna(sma5) or pd.isna(sma20) or sma5 <= sma20:
+                sma5 = today["SMA5"] if "SMA5" in today else None
+                sma20 = today["SMA20"] if "SMA20" in today else None
+                if sma5 is None or sma20 is None or sma5 <= sma20:
                     continue
 
             if config.get("VOLUME"):
-                v_today = today.get("Volume")
-                v_yest = yesterday.get("Volume")
-                if v_today is None or v_yest is None or pd.isna(v_today) or pd.isna(v_yest) or v_today <= v_yest * 1.5:
+                v_today = today["Volume"] if "Volume" in today else None
+                v_yest = yesterday["Volume"] if "Volume" in yesterday else None
+                if v_today is None or v_yest is None or v_today <= v_yest * 1.5:
                     continue
 
             if config.get("MACD"):
-                macd = today.get("MACD_diff")
-                if macd is None or pd.isna(macd) or macd <= 0:
+                macd = today["MACD_diff"] if "MACD_diff" in today else None
+                if macd is None or macd <= 0:
                     continue
 
             if config.get("CHANGE"):
-                c_today = today.get("Close")
-                c_yest = yesterday.get("Close")
-                if c_today is None or c_yest is None or pd.isna(c_today) or pd.isna(c_yest) or (c_today - c_yest) / c_yest <= 0.03:
+                c_today = today["Close"] if "Close" in today else None
+                c_yest = yesterday["Close"] if "Close" in yesterday else None
+                if c_today is None or c_yest is None or (c_today - c_yest) / c_yest <= 0.03:
                     continue
 
             if config.get("BREAKOUT"):
-                close = today.get("Close")
-                if close is None or pd.isna(close):
-                    continue
-                max20 = data["Close"].rolling(20).max().iloc[-2] if len(data) >= 20 else None
-                if max20 is None or pd.isna(max20) or close <= max20:
+                close = today["Close"] if "Close" in today else None
+                max20 = data["Close"].rolling(20).max().iloc[-2] if "Close" in data and len(data) >= 20 else None
+                if close is None or max20 is None or close <= max20:
                     continue
 
             if config.get("PE")[0] and fund.get("pe", 1000) >= config["PE"][1]:
